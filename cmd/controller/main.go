@@ -145,9 +145,9 @@ func main() {
 	err = ctrl.NewControllerManagedBy(mgr).
 		For(&in4itv1.StaticPage{}).
 		Complete(&reconciler{
-			Client:     mgr.GetClient(), // Controller Client
+			Client:     mgr.GetClient(), // Controller Client for your CRD
 			scheme:     mgr.GetScheme(),
-			kubeClient: clientset,
+			kubeClient: clientset, // Kube Controller Client
 		})
 	if err != nil {
 		setupLog.Error(err, "unable to create controller")
