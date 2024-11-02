@@ -26,11 +26,13 @@ import (
 )
 
 var (
+	// creates a new scheme to be added to your deployment
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
 )
 
 func init() {
+	// register the scheme
 	utilruntime.Must(in4itv1.AddToScheme(scheme))
 }
 
@@ -40,6 +42,7 @@ type reconciler struct {
 	kubeClient *kubernetes.Clientset
 }
 
+// any change to your deployment will reflect to your K8s API server through controller
 func (r *reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx).WithValues("staticpage", req.NamespacedName)
 	log.Info("reconciling staticpage")
@@ -130,6 +133,7 @@ func main() {
 
 	ctrl.SetLogger(zap.New())
 
+	// starts the controller once cluster configured
 	mgr, err := ctrl.NewManager(config, ctrl.Options{
 		Scheme: scheme,
 	})
@@ -141,7 +145,7 @@ func main() {
 	err = ctrl.NewControllerManagedBy(mgr).
 		For(&in4itv1.StaticPage{}).
 		Complete(&reconciler{
-			Client:     mgr.GetClient(),
+			Client:     mgr.GetClient(), // Controller Client
 			scheme:     mgr.GetScheme(),
 			kubeClient: clientset,
 		})
